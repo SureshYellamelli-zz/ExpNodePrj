@@ -1,23 +1,39 @@
 var express = require('express');
-var bookRouter = require('./routers');
+
 var app = express();
-app.use('/Books', bookRouter);
+
+var port = process.env.PORT || 5000;
+var nav = [{
+    Link: '/Books',
+    Text: 'Book'
+    }, {
+    Link: '/Authors',
+    Text: 'Author'
+    }];
+var bookRouter = require('./src/routes/bookRoutes')(nav);
+
 app.use(express.static('public'));
 app.set('views', './src/views');
-app.set('view engine', 'ejs');  
-app.use('/', function (req, res) { 
+
+app.set('view engine', 'ejs');
+app.use('/Books', bookRouter);
+app.get('/', function (req, res) {
     res.render('index', {
-        title: 'Library Applicaion',
-        nav:
-           [
-             { Link: '/Books', Title: 'Books'},
-             { Link: '/Authors', Title: 'Authors'}
-           ]
+        title: 'Hello from render',
+        nav: [{
+            Link: '/Books',
+            Text: 'Books'
+        }, {
+            Link: '/Authors',
+            Text: 'Authors'
+        }]
     });
 });
-var port = process.env.port || 5000;
-app.listen(port, (err) => {
-    if (!err) {
-        console.log('Server listing on port: ' + port);
-    }
+
+app.get('/books', function (req, res) {
+    res.send('Hello Books');
+});
+
+app.listen(port, function (err) {
+    console.log('running server on port ' + port);
 });
