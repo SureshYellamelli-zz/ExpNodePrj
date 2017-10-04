@@ -1,11 +1,9 @@
 var express = require('express');
-
-var bookRouter = express.Router();
-
-var router = function(nav){
-    var books = [
+var mongodb = require('mongodb').MongoClient;
+var adminRouter = express.Router();
+var books = [
     {
-        title: 'War and Peace',
+        title: 'War and shit',
         genre: 'Historical Fiction',
         author: 'Lev Nikolayevich Tolstoy',
         read: false
@@ -53,25 +51,20 @@ var router = function(nav){
         read: false
         }
     ];
-    bookRouter.route('/')
-    .get(function (req, res) {
-        res.render('bookListView', {
-            title: 'Books',
-            nav: nav,
-            books: books
-        });
-    });
+var router = function (nav) {
 
-    bookRouter.route('/:id')
-    .get(function (req, res) {
-        var id = req.params.id;
-        res.render('bookView', {
-            title: 'Books',
-            nav: nav,
-            book: books[id]
+    adminRouter.route('/addBooks')
+        .get(function (req, res) {
+            var url = 'mongodb://localhost:27017/libraryApp';
+            mongodb.connect(url, (err, db) =>{
+                var collection = db.collection('books');
+                collection.insertMany(books, (err, results)=>{
+                    res.send(results);
+                    db.close();
+                });
+            });
+            //res.send('Adding book');
         });
-    });
-    
-    return bookRouter;
+    return adminRouter;
 }
 module.exports = router;
